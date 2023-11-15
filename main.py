@@ -11,16 +11,19 @@ equalSymbol = {'='}
 
 currentIndex = 0
 
+
 def get_next_token():
     global currentIndex
     while True:
         currentChar = code[currentIndex]
 
         currentIndex += 1
-#ب
+
+
 class State:
     def next_state(self, currentChar):
         pass
+
 
 class LastState(State):
     def next_state(self, currentChar):
@@ -32,6 +35,7 @@ class LastState(State):
     def is_lookahead(self):
         pass
 
+
 class ErrorState(State):
 
     def get_error_text(self):
@@ -40,6 +44,7 @@ class ErrorState(State):
     def is_last_error_state(self):
         pass
 
+
 class NumberState(LastState):
     def get_token_type(self):
         return "number"
@@ -47,10 +52,12 @@ class NumberState(LastState):
     def is_lookahead(self):
         return True
 
+
 class FirstState(State):
     def next_state(self, currentChar):
         if currentChar in numbers:
             return State1()
+
 
 class State1(State):
     def next_state(self, currentChar):
@@ -60,6 +67,7 @@ class State1(State):
             return ErrorState1()
         else:
             return NumberState()
+
 
 class ErrorState1(ErrorState):
 
@@ -72,15 +80,8 @@ class ErrorState1(ErrorState):
     def is_last_error_state(self):
         return self.is_last_error_state
 
-    def get_next_state(self, currentChar):
+    def next_state(self, currentChar):
         if currentChar in letters:
             return ErrorState1(False)
         else:
             return ErrorState1(True)
-
-
-
-
-
-
-
