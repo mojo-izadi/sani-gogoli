@@ -17,7 +17,7 @@ def get_next_token():
         currentChar = code[currentIndex]
 
         currentIndex += 1
-
+#ب
 class State:
     def next_state(self, currentChar):
         pass
