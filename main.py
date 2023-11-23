@@ -1,8 +1,10 @@
 import string
 
-code = open("./input.txt", "r")
+file_code = open("./input.txt", "r")
+code = file_code.read()
+file_code.close()
 
-numbers = set(range(0, 10))
+numbers = set([str(i) for i in range(0, 10)])
 letters = set(string.ascii_letters)
 alphanumeric = numbers.union(letters)
 whitespace = set(string.whitespace)
@@ -10,42 +12,58 @@ symbols = {';', ':', ',', '(', ')', '{', '}', '[', ']', '+', '-', '<', '>'}
 equalSymbol = {'='}
 slash = {'/'}
 star = {'*'}
-Eof = {'fuck you because im end of file'}
+Eof = {None}
 
 validChars = alphanumeric.union(whitespace)\
     .union(symbols).union(equalSymbol).union(slash).union(star).union(Eof)
 
+lineNumber = 1
 currentIndex = 0
+lastIndex = len(code)
 
 def get_next_token():
-    global currentIndex
+    global currentIndex, lastIndex, lineNumber
+
+    if lastIndex <= currentIndex:
+        return 'file ended'
+    
     state = FirstState()
     initialCurrentIndex = currentIndex
 
     while True:
-        currentChar = code[currentIndex]
-        
+        if currentIndex < lastIndex:
+            currentChar = code[currentIndex] 
+        elif currentIndex == lastIndex:
+            currentChar = None
+        else:
+            return "file ended"
+
         state = state.next_state(currentChar)
 
-        if state is LastState:
+        if isinstance(state, LastState):
             if state.is_lookahead():
                 currentIndex -= 1
+
+            if isinstance(state, WhiteSpace) and currentChar == '\n':
+                lineNumber += 1
             
             result = ('lastState', state.get_token_type())
             break
 
-        if state is ErrorState:
+        if isinstance(state, ErrorState):
             if state.is_finish():
                 if state.is_lookahead():
                     currentIndex -= 1
 
                 result = ('errorState', state.get_error_type())
                 break
-
+        
+        if currentChar in Eof:
+            raise Exception("end of file reached invalidly")
         currentIndex += 1
     
     currentIndex += 1
-    return (result, code[initialCurrentIndex : currentIndex])
+    return (result[0], result[1], code[initialCurrentIndex : currentIndex], lineNumber)
 
 
 
@@ -167,14 +185,14 @@ class State8(State):
 
 class CommentWithLookahead(LastState):
     def get_token_type(self):
-        "comment"
+        return "comment"
 
     def is_lookahead(self):
         return True
 
 class CommentWithoutLookahead(LastState):
     def get_token_type(self):
-        "comment"
+        return "COMMENT"
 
     def is_lookahead(self):
         return False
@@ -182,7 +200,7 @@ class CommentWithoutLookahead(LastState):
     
 class NumberState(LastState):
     def get_token_type(self):
-        return "number"
+        return "NUM"
 
     def is_lookahead(self):
         return True
@@ -198,23 +216,23 @@ class WhiteSpace(LastState):
 
 class Identifier(LastState):
     def get_token_type(self):
-        return "Identifier"
+        return "ID"
     
     def is_lookahead(self):
-        True
+        return True
 
 
 class SymbolWithoutLookahead(LastState):
     def get_token_type(self):
-        "Symbol"
+        return "Symbol"
     def is_lookahead(self):
-        False
+        return False
 
 class SymbolWithLookahead(LastState):
     def get_token_type(self):
-        "Symbol"
+        return "Symbol"
     def is_lookahead(self):
-        True
+        return True
 
 
 class InvalidNumberErrorState(ErrorState):
@@ -289,3 +307,63 @@ class UnmatchedCommentErrorState(ErrorState):
     
     def get_error_type(self):
         return "Unmatched comment"
+    
+
+# print(isinstance(State1(), State1))
+
+keywords = {'if', 'else', 'void', 'int', 'while', 'break', 'return'}
+
+nextToken = None
+lastStates = []
+errors = []
+symbol_table = set(keywords)
+
+while True:
+    nextToken = get_next_token()
+    if nextToken == "file ended":
+        break
+    if nextToken[0]  == "lastState":
+        if nextToken[1] != 'whiteSpace':
+            if nextToken[1] == 'ID':
+                symbol_table.add(nextToken[2])
+            lastStates.append(nextToken)
+
+    elif nextToken[0]  == "errorState":
+        errors.append(nextToken)
+    else:
+        raise Exception("invalid operation")
+    print(nextToken)
+
+
+tokens = [[] for _ in range(0, lineNumber)]
+for lastState in lastStates:
+    key = lastState[1]
+    if  lastState[2] in keywords:
+        key = 'KEYWORD'
+    tokens[lastState[3]-1].append(f'{key, lastState[2]}')
+
+tokensToStore = []
+for i in range(0, len(tokens)):
+    token = tokens[i]
+    if len(token) == 0:
+        continue
+    tokensToStore.append(f'{i+1}.\t{" ".join(token)}')
+
+tokensToStoreStr = "\n".join(tokensToStore)
+f = open("tokens.txt", "w")
+f.write(tokensToStoreStr)
+f.close()
+
+
+symbol_table_list = list(symbol_table)
+
+symbol_table_str = "\n".join([f'{i+1}.\t{symbol_table_list[i]}' for i in range(0, len(symbol_table_list))])
+f = open("symbol_table.txt", "w")
+f.write(symbol_table_str )
+f.close()
+
+
+f = open("tokens.txt", "w")
+f.write(tokensToStoreStr)
+f.close()
+
