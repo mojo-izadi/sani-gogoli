@@ -40,10 +40,10 @@ class LastState():
 
 
 class ErrorState:
-    def error_finish():
+    def is_finish(self):
         pass
-
-    def error_finish(currentChar):
+    
+    def next_state(self, currentChar):
         pass
 
     def get_error_type(self):
@@ -193,13 +193,16 @@ class SymbolWithLookahead(LastState):
 
 class InvalidNumberErrorState(ErrorState):
     
-    def error_finish():
-        return False
+    def __init__(self):
+        self.isFinish = False
+
+    def is_finish(self):
+        return self.isFinish
     
-    def error_finish(currentChar):
+    def next_state(self, currentChar):
         if currentChar in letters:
-            return False
-        return True
+            self.isFinish = False
+        self.isFinish = True
     
     def get_error_type(self):
         return 'Invalid number'
@@ -207,11 +210,14 @@ class InvalidNumberErrorState(ErrorState):
 
 class InvalidInputErrorState(ErrorState):
 
-    def error_finish():
-        return False
+    def __init__(self):
+        self.isFinish = False
+        
+    def is_finish(self):
+        return self.isFinish
     
-    def error_finish(currentChar):
-        return currentChar in validChars
+    def next_state(self, currentChar):
+        self.isFinish = currentChar in validChars
 
     def get_error_type(self):
         return "Invalid input"
@@ -219,11 +225,14 @@ class InvalidInputErrorState(ErrorState):
 
 class UnclosedCommentErrorState(ErrorState):
     
-    def error_finish():
-        return True
+    def __init__(self):
+        self.isFinish = True
+        
+    def is_finish(self):
+        return self.isFinish
     
-    def error_finish(currentChar):
-        return True
+    def next_state(self, currentChar):
+        pass
 
     def get_error_type(self):
         return "Unclosed comment"
@@ -231,11 +240,14 @@ class UnclosedCommentErrorState(ErrorState):
 
 class UnmatchedCommentErrorState(ErrorState):
     
-    def error_finish():
-        return True
+    def __init__(self):
+        self.isFinish = True
+        
+    def is_finish(self):
+        return self.isFinish
     
-    def error_finish(currentChar):
-        return True
+    def next_state(self, currentChar):
+        pass
 
     def get_error_type(self):
         return "Unmatched comment"
