@@ -17,13 +17,36 @@ validChars = alphanumeric.union(whitespace)\
 
 currentIndex = 0
 
-
 def get_next_token():
     global currentIndex
+    state = FirstState()
+    initialCurrentIndex = currentIndex
+
     while True:
         currentChar = code[currentIndex]
-        #move state
+        
+        state = state.next_state(currentChar)
+
+        if state is LastState:
+            if state.is_lookahead():
+                currentIndex -= 1
+            
+            result = ('lastState', state.get_token_type())
+            break
+
+        if state is ErrorState:
+            if state.is_finish():
+                if state.is_lookahead():
+                    currentIndex -= 1
+
+                result = ('errorState', state.get_error_type())
+                break
+
         currentIndex += 1
+    
+    currentIndex += 1
+    return (result, code[initialCurrentIndex : currentIndex])
+
 
 
 class State:
@@ -46,6 +69,9 @@ class ErrorState:
     def next_state(self, currentChar):
         pass
 
+    def is_lookahead(self):
+        pass
+    
     def get_error_type(self):
         pass
     
@@ -204,6 +230,9 @@ class InvalidNumberErrorState(ErrorState):
             self.isFinish = False
         self.isFinish = True
     
+    def is_lookahead(self):
+        return True
+
     def get_error_type(self):
         return 'Invalid number'
     
@@ -218,7 +247,10 @@ class InvalidInputErrorState(ErrorState):
     
     def next_state(self, currentChar):
         self.isFinish = currentChar in validChars
-
+    
+    def is_lookahead(self):
+        return True
+    
     def get_error_type(self):
         return "Invalid input"
     
@@ -234,6 +266,9 @@ class UnclosedCommentErrorState(ErrorState):
     def next_state(self, currentChar):
         pass
 
+    def is_lookahead(self):
+        return False
+    
     def get_error_type(self):
         return "Unclosed comment"
     
@@ -249,5 +284,8 @@ class UnmatchedCommentErrorState(ErrorState):
     def next_state(self, currentChar):
         pass
 
+    def is_lookahead(self):
+        return False
+    
     def get_error_type(self):
         return "Unmatched comment"
