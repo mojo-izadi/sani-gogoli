@@ -189,7 +189,7 @@ class State8(State):
 
 class CommentWithLookahead(LastState):
     def get_token_type(self):
-        return "comment"
+        return "COMMENT"
 
     def is_lookahead(self):
         return True
@@ -228,13 +228,13 @@ class Identifier(LastState):
 
 class SymbolWithoutLookahead(LastState):
     def get_token_type(self):
-        return "Symbol"
+        return "SYMBOL"
     def is_lookahead(self):
         return False
 
 class SymbolWithLookahead(LastState):
     def get_token_type(self):
-        return "Symbol"
+        return "SYMBOL"
     def is_lookahead(self):
         return True
 
@@ -313,7 +313,6 @@ class UnmatchedCommentErrorState(ErrorState):
         return "Unmatched comment"
     
 
-# print(isinstance(State1(), State1))
 
 keywords = {'if', 'else', 'void', 'int', 'while', 'break', 'return'}
 
@@ -336,7 +335,7 @@ while True:
         errors.append(nextToken)
     else:
         raise Exception("invalid operation")
-    print(nextToken)
+    # print(nextToken)
 
 def prepare_output(stateReports):
     
@@ -345,7 +344,7 @@ def prepare_output(stateReports):
         key = lastState[1]
         if  lastState[2] in keywords:
             key = 'KEYWORD'
-        tokens[lastState[3]-1].append(f'{key, lastState[2]}')
+        tokens[lastState[3]-1].append(f'({key}, {lastState[2]})')
 
     tokensToStore = []
     for i in range(0, len(tokens)):
