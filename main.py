@@ -38,7 +38,10 @@ def get_next_token():
         else:
             return "file ended"
 
-        state = state.next_state(currentChar)
+        if isinstance(state, ErrorState):
+            state.next_state(currentChar)
+        else:        
+            state = state.next_state(currentChar)
 
         if isinstance(state, LastState):
             if state.is_lookahead():
@@ -110,6 +113,7 @@ class FirstState(State):
             return WhiteSpace()
         if currentChar in star:
             return State8()
+        return InvalidInputErrorState()
         
 
 class State1(State):
@@ -334,22 +338,27 @@ while True:
         raise Exception("invalid operation")
     print(nextToken)
 
+def prepare_output(stateReports):
+    
+    tokens = [[] for _ in range(0, lineNumber)]
+    for lastState in stateReports:
+        key = lastState[1]
+        if  lastState[2] in keywords:
+            key = 'KEYWORD'
+        tokens[lastState[3]-1].append(f'{key, lastState[2]}')
 
-tokens = [[] for _ in range(0, lineNumber)]
-for lastState in lastStates:
-    key = lastState[1]
-    if  lastState[2] in keywords:
-        key = 'KEYWORD'
-    tokens[lastState[3]-1].append(f'{key, lastState[2]}')
+    tokensToStore = []
+    for i in range(0, len(tokens)):
+        token = tokens[i]
+        if len(token) == 0:
+            continue
+        tokensToStore.append(f'{i+1}.\t{" ".join(token)}')
 
-tokensToStore = []
-for i in range(0, len(tokens)):
-    token = tokens[i]
-    if len(token) == 0:
-        continue
-    tokensToStore.append(f'{i+1}.\t{" ".join(token)}')
+    return "\n".join(tokensToStore)
 
-tokensToStoreStr = "\n".join(tokensToStore)
+
+
+tokensToStoreStr = prepare_output(lastStates)
 f = open("tokens.txt", "w")
 f.write(tokensToStoreStr)
 f.close()
@@ -367,3 +376,12 @@ f = open("tokens.txt", "w")
 f.write(tokensToStoreStr)
 f.close()
 
+
+
+f = open("lexical_errors.txt", "w")
+if len(errors) == 0:
+    errors_str = 'There is no lexical error.'
+else:
+    errors_str = prepare_output(errors)
+f.write(errors_str)
+f.close()
