@@ -8,6 +8,10 @@ alphanumeric = numbers.union(letters)
 whitespace = set(string.whitespace)
 symbols = {';', ':', ',', '(', ')', '{', '}', '[', ']', '+', '-', '*', '<', '>'}
 equalSymbol = {'='}
+slash = {'/'}
+star = {'*'}
+
+validChars = alphanumeric.union(whitespace).union(symbols).union(equalSymbol).union(slash)
 
 currentIndex = 0
 
@@ -16,7 +20,7 @@ def get_next_token():
     global currentIndex
     while True:
         currentChar = code[currentIndex]
-
+        #move state
         currentIndex += 1
 
 
@@ -25,10 +29,7 @@ class State:
         pass
 
 
-class LastState(State):
-    def next_state(self, currentChar):
-        raise Exception('fucked up')
-
+class LastState():
     def get_token_type(self):
         pass
 
@@ -36,14 +37,48 @@ class LastState(State):
         pass
 
 
-class ErrorState(State):
+class ErrorState:
 
-    def get_error_text(self):
+    def error_finish(currentChar):
         pass
 
-    def is_last_error_state(self):
+    def get_error_type(self):
         pass
+    
 
+class FirstState(State):
+    def next_state(self, currentChar):
+        if currentChar in numbers:
+            return State1()
+        if currentChar in letters:
+            return State2()
+        if currentChar in symbols:
+            return Symbol1()
+        if currentChar in equalSymbol:
+            return State3()
+        if currentChar in slash:
+            return State4()
+        
+
+class State1(State):
+    def next_state(self, currentChar):
+        if currentChar in numbers:
+            return self
+        if currentChar in letters:
+            return ErrorState1()
+        else:
+            return NumberState()
+        
+    
+class ErrorState1(ErrorState):
+
+    def get_error_type(self):
+        return 'Invalid number'
+
+    def error_finish(currentChar):
+        if currentChar in letters:
+            return False
+        return True
 
 class NumberState(LastState):
     def get_token_type(self):
@@ -51,37 +86,68 @@ class NumberState(LastState):
 
     def is_lookahead(self):
         return True
+    
 
 
-class FirstState(State):
+class State2(State):
     def next_state(self, currentChar):
-        if currentChar in numbers:
-            return State1()
-
-
-class State1(State):
-    def next_state(self, currentChar):
-        if currentChar in numbers:
-            return State1()
-        if currentChar in letters:
-            return ErrorState1()
+        if currentChar in alphanumeric:
+            return self
+        if currentChar in validChars:
+            return Identifier()
         else:
-            return NumberState()
+            return ErrorState2()
+
+class ErrorState2(ErrorState):
+    def error_finish(currentChar):
+        return currentChar in validChars
+
+    def get_error_type(self):
+        return "Invalid input"
+
+class Identifier(LastState):
+    def get_token_type(self):
+        return "Identifier"
+    
+    def is_lookahead(self):
+        True
 
 
-class ErrorState1(ErrorState):
+class Symbol1(LastState):
+    def get_token_type(self):
+        "Symbol"
+    def is_lookahead(self):
+        False
 
-    def __init__(self, is_last_error_state):
-        self.is_last_error_state = is_last_error_state
+class Symbol2(LastState):
+    def get_token_type(self):
+        "Symbol"
+    def is_lookahead(self):
+        True
 
-    def get_error_text(self):
-        return 'number error'
 
-    def is_last_error_state(self):
-        return self.is_last_error_state
-
+class State3(State):
     def next_state(self, currentChar):
-        if currentChar in letters:
-            return ErrorState1(False)
-        else:
-            return ErrorState1(True)
+        if currentChar in equalSymbol:
+            return Symbol1()
+        return Symbol2()
+    
+class State4(State):
+    def next_state(self, currentChar):
+        if currentChar in slash:
+            return State5()
+        if currentChar in star:
+            return State6()
+        return Symbol2()
+    
+class State5(State):
+    def next_state(self, currentChar):
+        if currentChar in slash:
+            return Symbol1()
+        return Symbol2()
+    
+class State6(State):
+    def next_state(self, currentChar):
+        if currentChar in slash:
+            return Symbol1()
+        return Symbol2()
