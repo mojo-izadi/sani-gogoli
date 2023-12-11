@@ -102,8 +102,26 @@ for nt in instructions.keys():
             nt_parse_data[t_index] = inst
 
 
+temp_parse_table = {}
+
+for key in parse_table:
+    cs = []
+    was__ = False
+    for c in key:
+        if c == '_':
+            was__ = True
+            continue
+        if was__:
+            c = c.upper()
+        cs.append(c)
+        was__ = False
+
+    new_key = ''.join(cs)
+    temp_parse_table[new_key] = parse_table[key]
+
+
 with open('parse_table.json', 'w') as file:
-    json.dump(parse_table , file)
+    json.dump(temp_parse_table, file)
 
 
 

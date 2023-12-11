@@ -90,8 +90,8 @@ class State3(State):
 
 class State4(State):
     def next_state(self, currentChar):
-        if currentChar in Data.slash:
-            return State5()
+        # if currentChar in Data.slash:
+        #     return State5()
         if currentChar in Data.star:
             return State6()
         return SymbolWithLookahead()
@@ -129,7 +129,9 @@ class State8(State):
     def next_state(self, currentChar):
         if currentChar in Data.slash:
             return UnmatchedCommentErrorState()
-        return SymbolWithLookahead()
+        if currentChar in Data.validChars:
+            return SymbolWithLookahead()
+        return InvalidInputErrorState()
 
 
 class CommentWithLookahead(LastState):
@@ -213,7 +215,7 @@ class InvalidInputErrorState(ErrorState):
         return self.isFinish
     
     def next_state(self, currentChar):
-        self.isFinish = currentChar in Data.validChars
+        self.isFinish = True
     
     def is_lookahead(self):
         return True
@@ -267,26 +269,27 @@ class Scanner:
         
         self.errors = []
         self.symbol_table = set(Data.keywords)
+        self.lineNumber = 1
+        self.currentIndex = 0
+        self.lastIndex = len(self.code)
+
 
     def get_next_token(self):
 
-        lineNumber = 1
-        currentIndex = 0
-        lastIndex = len(self.code)
-
-        if lastIndex <= currentIndex:
-            return ('file end', 'file ended', '┤', lineNumber)
+        
+        if self.lastIndex <= self.currentIndex:
+            return ('file end', 'file ended', '┤', self.lineNumber)
         
         state = FirstState()
-        initialCurrentIndex = currentIndex
+        initialCurrentIndex = self.currentIndex
 
         while True:
-            if currentIndex < lastIndex:
-                currentChar = self.code[currentIndex] 
-            elif currentIndex == lastIndex:
+            if self.currentIndex < self.lastIndex:
+                currentChar = self.code[self.currentIndex] 
+            elif self.currentIndex == self.lastIndex:
                 currentChar = None
             else:
-                return ('file end', 'file ended', '┤', lineNumber)
+                return ('file end', 'file ended', '┤', self.lineNumber)
 
             if isinstance(state, ErrorState):
                 state.next_state(currentChar)
@@ -295,10 +298,10 @@ class Scanner:
 
             if isinstance(state, LastState):
                 if state.is_lookahead():
-                    currentIndex -= 1
+                    self.currentIndex -= 1
 
                 if isinstance(state, WhiteSpace) and currentChar == '\n':
-                    lineNumber += 1
+                    self.lineNumber += 1
                 
                 result = ('lastState', state.get_token_type())
                 break
@@ -306,29 +309,36 @@ class Scanner:
             if isinstance(state, ErrorState):
                 if state.is_finish():
                     if state.is_lookahead():
-                        currentIndex -= 1
+                        self.currentIndex -= 1
 
                     result = ('errorState', state.get_error_type())
                     break
             
             if currentChar in Data.Eof:
                 raise Exception("end of file reached invalidly")
-            currentIndex += 1
+            self.currentIndex += 1
         
-        currentIndex += 1
+        self.currentIndex += 1
 
-        tokenToReturn = (result[0], result[1], self.code[initialCurrentIndex : currentIndex], lineNumber)
+        tokenToReturn = (result[0], result[1], self.code[initialCurrentIndex : self.currentIndex], self.lineNumber)
 
         if tokenToReturn[0]  == "lastState":
-            if tokenToReturn[1] == 'whiteSpace':
+            if tokenToReturn[1] == 'whiteSpace' or tokenToReturn[1] == 'COMMENT':
                 return self.get_next_token()
             else:
                 if tokenToReturn[1] == 'ID':
                     self.symbol_table.add(tokenToReturn[2])
                 if  tokenToReturn[2] in Data.keywords:
-                    tokenToReturn[1] = 'KEYWORD'
-            
+                    tokenToReturn = (tokenToReturn[0], 'KEYWORD', tokenToReturn[2], tokenToReturn[3])
+        
+        elif tokenToReturn[0] == "errorState":
+            if tokenToReturn[1] == 'Unclosed comment':
+                tokenToReturn = tokenToReturn[0], tokenToReturn[1], f'{tokenToReturn[2][0:min(7, len(tokenToReturn[2]))]}...', tokenToReturn[3]
+            self.errors.append(tokenToReturn)
+        else:
+            raise Exception("invalid operation")
 
+        # print(tokenToReturn)
         return tokenToReturn
 
     # while True:
