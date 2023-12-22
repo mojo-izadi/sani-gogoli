@@ -41,32 +41,32 @@ while True:
     if headers.__contains__(popped.name):
         if popped.name != token_value and popped.name != 'ID':
             print('invalid char')
+        popped.name = f'({token_type}, {token_value})'
         token = get_next_token()
         token_type = token[1]
         token_value = token[2]
         continue
-    elif popped.name == '':
+    elif popped.name == 'epsilon':
         pass
     else:
         temp_token_value = token_value
         if not headers.__contains__(token_value):
             temp_token_value = 'ID'
 
-        
         instruction_to_use = parse_table[popped.name][headers[temp_token_value]]
     
         states = instruction_rights[instruction_to_use].split(' ')
-        states.reverse()
+        newStack = []
         for state in states:
-            print(state)
-            # for pre, fill, node in RenderTree(first_node):
-            #     print("%s%s" % (pre.encode('utf-8'), node.name))
-            # print('fuck')                
-            stack.append(Node(state, parent=popped))
+            newStack.append(Node(state if state != '' else 'epsilon', parent=popped))
+        
+        newStack.reverse()
+        for n in newStack:
+            stack.append(n)
 
+Node('$', parent=first_node)
 for pre, fill, node in RenderTree(first_node):
-    print("%s%s" % (pre.encode('utf-8'), node.name))
-# print(RenderTree(first_node, style=render.ContStyle()))
+    print("%s%s" % (pre, node.name))
 
 
 
