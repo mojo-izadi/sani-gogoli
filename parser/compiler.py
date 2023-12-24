@@ -263,7 +263,7 @@ class Scanner:
 
     def __init__(self):
         self.data = Data()
-        file_code = open("P2_TestCases/T01/input.txt", "r")
+        file_code = open("parser/P2_TestCases/T10/input.txt", "r")
         self.code = file_code.read()
         file_code.close()
         
@@ -341,22 +341,3 @@ class Scanner:
         # print(tokenToReturn)
         return tokenToReturn
 
-    # while True:
-    #     nextToken = get_next_token()
-    #     if nextToken == "file ended":
-    #         break
-
-    #     if nextToken[0]  == "lastState":
-    #         if nextToken[1] != 'whiteSpace':
-    #             if nextToken[1] == 'ID':
-    #                 symbol_table.add(nextToken[2])
-    #             if  nextToken[2] in keywords:
-    #                 nextToken[1] = 'KEYWORD'
-    #             lastStates.append(nextToken)
-    #             next_token
-        
-
-    #     elif nextToken[0]  == "errorState":
-    #         errors.append(nextToken)
-    #     else:
-    #         raise Exception("invalid operation")
