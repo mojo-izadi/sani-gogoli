@@ -263,7 +263,7 @@ class Scanner:
 
     def __init__(self):
         self.data = Data()
-        file_code = open("parser/P2_TestCases/T10/input.txt", "r")
+        file_code = open("input.txt", "r")
         self.code = file_code.read()
         file_code.close()
         

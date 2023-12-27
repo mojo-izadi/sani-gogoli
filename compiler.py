@@ -1,5 +1,5 @@
 import json, csv
-import compiler
+import compiler2
 from anytree import Node, RenderTree, render
 
 
@@ -25,7 +25,7 @@ first_node_ins = Node('-1')
 stack = ['┤', first_node]
 stack_ins = ['', first_node_ins]
 
-scanner = compiler.Scanner()
+scanner = compiler2.Scanner()
 
 def get_next_token():
     return scanner.get_next_token()
@@ -42,12 +42,12 @@ while True:
     # print(popped)
     # print(token_value)
 
-    if popped == '┤':#and token_value == '┤':
+    if popped == '┤':# or (popped != '┤' and token_value == '┤'):
         if token_value != '┤':
             syntax_errors.append(("EOF" ,"Unexpected" ,line_number))
         break
     if headers.__contains__(popped.name):
-        if popped.name != token_value and popped.name != 'ID':
+        if popped.name != token_value and popped.name != 'ID' and popped.name != 'NUM':
             syntax_errors.append((token_value ,"illegal" ,line_number))
         popped.name = f'({token_type}, {token_value})'
         token = get_next_token()
@@ -61,6 +61,8 @@ while True:
         temp_token_value = token_value
         if not headers.__contains__(token_value):
             temp_token_value = 'ID'
+            if token_type == 'NUM':
+                temp_token_value = token_type
 
         instruction_to_use = parse_table[popped.name][headers[temp_token_value]]
         
@@ -68,6 +70,7 @@ while True:
             syntax_errors.append( (popped.name, "missing", line_number) )
             # print(temp_token_value)
             # print(popped.name)
+            popped.parent = None
             continue
 
         states = instruction_rights[instruction_to_use].split(' ')
@@ -88,9 +91,11 @@ while True:
 
 Node('$', parent=first_node)
 f = open("parse_tree.txt", "w", encoding="utf-16")
+s = ""
 for pre, fill, node in RenderTree(first_node):
-    s = "%s%s\n" % (pre, node.name)
-    f.write(s)
+    s += "%s%s\n" % (pre, node.name)
+    # f.write(s)
+f.write(s[:-1])
 f.close()
 
 Node('$', parent=first_node_ins)
