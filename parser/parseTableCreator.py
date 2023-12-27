@@ -55,25 +55,15 @@ for nt in instructions.keys():
     for inst in instructions[nt]:
         for t_index in nt_predict[inst]:
             nt_parse_data[t_index] = inst
+    nt_parse_data += [-1]
 
 
-temp_parse_table = {}
-
-for key in parse_table:
-    cs = []
-    was__ = False
-    for c in key:
-        if c == '_':
-            was__ = True
-            continue
-        if was__:
-            c = c.upper()
-        cs.append(c)
-        was__ = False
-
-    new_key = ''.join(cs)
-    temp_parse_table[new_key] = parse_table[key]
+for nt in instructions.keys():
+    nt_parse_data = parse_table[nt]
+    for i in range(len(headers)):
+        if (nt_parse_data[i] == -1) and (nt_follows[nt].__contains__(headers[i])):
+            nt_parse_data[i] = "synch"
 
 
 with open('grammar_data_files/parse_table.json', 'w') as file:
-    json.dump(temp_parse_table, file)
+    json.dump(parse_table, file)
