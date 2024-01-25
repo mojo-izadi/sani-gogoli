@@ -1,2 +1,0 @@
-#10 : syntax error, illegal return
-#10 : syntax error, illegal NUM

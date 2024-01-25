@@ -1,3 +1,0 @@
-#9 : syntax error, illegal ;
-#10 : syntax error, illegal }
-#11 : syntax error, Unexpected EOF

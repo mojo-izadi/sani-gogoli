@@ -3,6 +3,7 @@ import json, csv
 from anytree import Node, RenderTree, render
 import string
 import time
+from code_gen_functions import Code_gen
 
 
 
@@ -351,7 +352,6 @@ class Scanner:
         return tokenToReturn
 
 
-
 parse_table = {"Program": [-1, -1, -1, -1, -1, -1, -1, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1], "DeclarationList": [2, 2, -1, 2, -1, 2, -1, 1, 1, -1, 2, 2, 2, 2, -1, 2, 2, -1, -1, -1, 2, 2, -1, 2, -1], "Declaration": ["synch", "synch", -1, "synch", -1, "synch", -1, 3, 3, -1, "synch", "synch", "synch", "synch", -1, "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "DeclarationInitial": [-1, "synch", "synch", -1, -1, "synch", "synch", 4, 4, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "DeclarationPrime": ["synch", 6, 6, "synch", -1, 5, -1, "synch", "synch", -1, "synch", "synch", "synch", "synch", -1, "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "VarDeclarationPrime": ["synch", 7, 8, "synch", -1, "synch", -1, "synch", "synch", -1, "synch", "synch", "synch", "synch", -1, "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "FunDeclarationPrime": ["synch", "synch", -1, "synch", -1, 9, -1, "synch", "synch", -1, "synch", "synch", "synch", "synch", -1, "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "TypeSpecifier": ["synch", -1, -1, -1, -1, -1, -1, 10, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "Params": [-1, -1, -1, -1, -1, -1, "synch", 12, 13, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "ParamList": [-1, -1, -1, -1, -1, -1, 15, -1, -1, 14, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "Param": [-1, -1, -1, -1, -1, -1, "synch", 16, 16, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "ParamPrime": [-1, -1, 17, -1, -1, -1, 18, -1, -1, 18, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "CompoundStmt": ["synch", "synch", -1, "synch", -1, "synch", -1, "synch", "synch", -1, 19, "synch", "synch", "synch", "synch", "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "StatementList": [20, 20, -1, 20, -1, 20, -1, -1, -1, -1, 20, 21, 20, 20, -1, 20, 20, -1, -1, -1, 20, 20, -1, -1, -1], "Statement": [22, 22, -1, 22, -1, 22, -1, -1, -1, -1, 23, "synch", 22, 24, "synch", 25, 26, -1, -1, -1, 22, 22, -1, -1, -1], "ExpressionStmt": [27, 29, -1, 27, -1, 27, -1, -1, -1, -1, "synch", "synch", 28, "synch", "synch", "synch", "synch", -1, -1, -1, 27, 27, -1, -1, -1], "SelectionStmt": ["synch", "synch", -1, "synch", -1, "synch", -1, -1, -1, -1, "synch", "synch", "synch", 30, "synch", "synch", "synch", -1, -1, -1, "synch", "synch", -1, -1, -1], "IterationStmt": ["synch", "synch", -1, "synch", -1, "synch", -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", 31, "synch", -1, -1, -1, "synch", "synch", -1, -1, -1], "ReturnStmt": ["synch", "synch", -1, "synch", -1, "synch", -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", "synch", 32, -1, -1, -1, "synch", "synch", -1, -1, -1], "ReturnStmtPrime": [34, 33, -1, 34, -1, 34, -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", "synch", "synch", -1, -1, -1, 34, 34, -1, -1, -1], "Expression": [36, "synch", -1, 35, "synch", 35, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 35, 35, -1, -1, -1], "B": [-1, 39, 38, -1, 39, 39, 39, -1, -1, 39, -1, -1, -1, -1, -1, -1, -1, 37, 39, 39, 39, 39, 39, -1, -1], "H": [-1, 41, -1, -1, 41, -1, 41, -1, -1, 41, -1, -1, -1, -1, -1, -1, -1, 40, 41, 41, 41, 41, 41, -1, -1], "SimpleExpressionZegond": [-1, "synch", -1, 42, "synch", 42, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 42, 42, -1, -1, -1], "SimpleExpressionPrime": [-1, 43, -1, -1, 43, 43, 43, -1, -1, 43, -1, -1, -1, -1, -1, -1, -1, -1, 43, 43, 43, 43, 43, -1, -1], "C": [-1, 45, -1, -1, 45, -1, 45, -1, -1, 45, -1, -1, -1, -1, -1, -1, -1, -1, 44, 44, -1, -1, -1, -1, -1], "Relop": ["synch", -1, -1, "synch", -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 46, 47, "synch", "synch", -1, -1, -1], "AdditiveExpression": [48, "synch", -1, 48, "synch", 48, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 48, 48, -1, -1, -1], "AdditiveExpressionPrime": [-1, 49, -1, -1, 49, 49, 49, -1, -1, 49, -1, -1, -1, -1, -1, -1, -1, -1, 49, 49, 49, 49, 49, -1, -1], "AdditiveExpressionZegond": [-1, "synch", -1, 50, "synch", 50, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 50, 50, -1, -1, -1], "D": [-1, 52, -1, -1, 52, -1, 52, -1, -1, 52, -1, -1, -1, -1, -1, -1, -1, -1, 52, 52, 51, 51, -1, -1, -1], "Addop": ["synch", -1, -1, "synch", -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 53, 54, -1, -1, -1], "Term": [55, "synch", -1, 55, "synch", 55, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 55, 55, -1, -1, -1], "TermPrime": [-1, 56, -1, -1, 56, 56, 56, -1, -1, 56, -1, -1, -1, -1, -1, -1, -1, -1, 56, 56, 56, 56, 56, -1, -1], "TermZegond": [-1, "synch", -1, 57, "synch", 57, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 57, 57, -1, -1, -1], "G": [-1, 59, -1, -1, 59, -1, 59, -1, -1, 59, -1, -1, -1, -1, -1, -1, -1, -1, 59, 59, 59, 59, 58, -1, -1], "SignedFactor": [62, "synch", -1, 62, "synch", 62, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 60, 61, "synch", -1, -1], "SignedFactorPrime": [-1, 63, -1, -1, 63, 63, 63, -1, -1, 63, -1, -1, -1, -1, -1, -1, -1, -1, 63, 63, 63, 63, 63, -1, -1], "SignedFactorZegond": [-1, "synch", -1, 66, "synch", 66, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 64, 65, "synch", -1, -1], "Factor": [68, "synch", -1, 69, "synch", 67, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", -1, -1], "VarCallPrime": [-1, 71, 71, -1, 71, 70, 71, -1, -1, 71, -1, -1, -1, -1, -1, -1, -1, -1, 71, 71, 71, 71, 71, -1, -1], "VarPrime": [-1, 73, 72, -1, 73, -1, 73, -1, -1, 73, -1, -1, -1, -1, -1, -1, -1, -1, 73, 73, 73, 73, 73, -1, -1], "FactorPrime": [-1, 75, -1, -1, 75, 74, 75, -1, -1, 75, -1, -1, -1, -1, -1, -1, -1, -1, 75, 75, 75, 75, 75, -1, -1], "FactorZegond": [-1, "synch", -1, 77, "synch", 76, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", -1, -1], "Args": [78, -1, -1, 78, -1, 78, 79, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 78, 78, -1, -1, -1], "ArgList": [80, -1, -1, 80, -1, 80, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 80, 80, -1, -1, -1], "ArgListPrime": [-1, -1, -1, -1, -1, -1, 82, -1, -1, 81, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]}
 instruction_rights = ["DeclarationList", "Declaration DeclarationList", "", "DeclarationInitial DeclarationPrime", "TypeSpecifier ID", "FunDeclarationPrime", "VarDeclarationPrime", ";", "[ NUM ] ;", "( Params ) CompoundStmt", "int", "void", "int ID ParamPrime ParamList", "void", ", Param ParamList", "", "DeclarationInitial ParamPrime", "[ ]", "", "{ DeclarationList StatementList }", "Statement StatementList", "", "ExpressionStmt", "CompoundStmt", "SelectionStmt", "IterationStmt", "ReturnStmt", "Expression ;", "break ;", ";", "if ( Expression ) Statement else Statement", "while ( Expression ) Statement", "return ReturnStmtPrime", ";", "Expression ;", "SimpleExpressionZegond", "ID B", "= Expression", "[ Expression ] H", "SimpleExpressionPrime", "= Expression", "G D C", "AdditiveExpressionZegond C", "AdditiveExpressionPrime C", "Relop AdditiveExpression", "", "<", "==", "Term D", "TermPrime D", "TermZegond D", "Addop Term D", "", "+", "-", "SignedFactor G", "SignedFactorPrime G", "SignedFactorZegond G", "* SignedFactor G", "", "+ Factor", "- Factor", "Factor", "FactorPrime", "+ Factor", "- Factor", "FactorZegond", "( Expression )", "ID VarCallPrime", "NUM", "( Args )", "VarPrime", "[ Expression ]", "", "( Args )", "", "( Expression )", "NUM", "ArgList", "", "Expression ArgListPrime", ", Expression ArgListPrime", ""]
 headers = ['ID', ';', '[', 'NUM', ']', '(', ')', 'int', 'void', ',', '{', '}', 'break', 'if', 'else', 'while', 'return', '=', '<', '==', '+', '-', '*', '┤', '/']
@@ -364,6 +364,7 @@ stack = ['┤', first_node]
 stack_ins = ['', first_node_ins]
 
 scanner = Scanner()
+code_gen = Code_gen()
 
 def get_next_token():
     return scanner.get_next_token()
@@ -382,7 +383,11 @@ while True:
     skip_token = False
     if popped == '┤':
         break
-    if headers.__contains__(popped.name):
+    if popped.name.startswith('#'):
+        function_to_run = popped.name[1:]
+        func = getattr(code_gen, function_to_run)
+        func(token_value)
+    elif headers.__contains__(popped.name):
         if popped.name != token_value and popped.name != 'ID' and popped.name != 'NUM':
             syntax_errors.append((popped.name ,"missing" ,line_number))
             popped.parent = None
@@ -392,7 +397,6 @@ while True:
             token_type = token[1]
             token_value = token[2]
             line_number = token[3]
-        continue
     elif popped.name == 'epsilon':
         pass
     else:
@@ -402,27 +406,25 @@ while True:
             if token_type == 'NUM':
                 temp_token_value = token_type
 
-        if token_value == "if":
-            print()
         instruction_to_use = parse_table[popped.name][headers[temp_token_value]]
         
-        if(instruction_to_use == -1):
-            if token_value == '┤':
-                syntax_errors.append(("EOF" ,"Unexpected" ,line_number))
-                invalid_end = True
-                popped.parent = None
-                break
-            syntax_errors.append( (temp_token_value, "illegal", line_number) )
-            token = get_next_token()
-            token_type = token[1]
-            token_value = token[2]
-            line_number = token[3]
-            skip_token = True
-            continue
-        if(instruction_to_use == "synch"):
-            syntax_errors.append( (popped.name, "missing", line_number) )
-            popped.parent = None
-            continue
+        # if(instruction_to_use == -1):
+        #     if token_value == '┤':
+        #         syntax_errors.append(("EOF" ,"Unexpected" ,line_number))
+        #         invalid_end = True
+        #         popped.parent = None
+        #         break
+        #     syntax_errors.append( (temp_token_value, "illegal", line_number) )
+        #     token = get_next_token()
+        #     token_type = token[1]
+        #     token_value = token[2]
+        #     line_number = token[3]
+        #     skip_token = True
+        #     continue
+        # if(instruction_to_use == "synch"):
+        #     syntax_errors.append( (popped.name, "missing", line_number) )
+        #     popped.parent = None
+        #     continue
         states = instruction_rights[instruction_to_use].split(' ')
         newStack = []
         for state in states:
@@ -432,6 +434,7 @@ while True:
         newStack.reverse()
         for n in newStack:
             stack.append(n)
+    
 
 
 if invalid_end:

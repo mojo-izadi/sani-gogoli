@@ -1,2 +1,0 @@
-#24 : syntax error, illegal /
-#24 : syntax error, illegal NUM
