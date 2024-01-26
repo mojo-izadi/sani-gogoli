@@ -85,6 +85,8 @@ class Code_gen:
         return_address = self.gettemp()
         return_value_address = self.gettemp()
         self.func_table[name] = function_data(name, type, return_address, return_value_address, first_instruction_index)
+        if name == 'main':
+            self.PB[0] = f'(JP, {first_instruction_index}, , )'
       
     def define_param_var(self, token):
         param_name = self.ss.pop()
