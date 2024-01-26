@@ -100,8 +100,6 @@ class State3(State):
 
 class State4(State):
     def next_state(self, currentChar):
-        # if currentChar in Data.slash:
-        #     return State5()
         if currentChar in Data.star:
             return State6()
         return SymbolWithLookahead()
@@ -458,5 +456,10 @@ if not syntax_errors:
     f.write("There is no syntax error.")
 else:
     f.writelines([f"#{error[2]} : syntax error, {error[1]} {error[0]}\n" for error in syntax_errors])
+
+f.close()
+
+f = open("code.txt", "w", encoding="utf-8")
+f.writelines([f"{i}.{code_gen.PB[i]}\n" for i in len(code_gen.PB)])
 
 f.close()
