@@ -9,6 +9,7 @@ class Code_gen:
         self.var_table = {}
         self.arr_table = {}
         self.current_func = None
+        self.calling_functions_stack = []
 
 
     def gettemp(self):
@@ -49,6 +50,12 @@ class Code_gen:
         tempValue = self.ss.pop()
         assignee = self.ss.pop()
         self.PB.append(f'(ASSIGN, {tempValue}, {assignee}, )')
+        self.ss.append(tempValue)
+    
+    def assign_arr(self, token):
+        tempValue = self.ss.pop()
+        assignee = self.ss.pop()
+        self.PB.append(f'(ASSIGN, {tempValue}, @{assignee}, )')
         self.ss.append(tempValue)
     
     def save_type(self, token):
@@ -109,6 +116,59 @@ class Code_gen:
         func_name = self.current_func
         self.PB.append(f'(JP, @{self.func_table[func_name].return_address}, , )')
     
+    def save_index_address(self, token):
+        index_temp = self.ss.pop()
+        array_id = self.ss.pop()
+        temp = self.gettemp()
+
+        if array_id in self.arr_table:
+            self.PB.append(f'(ADD, {index_temp}, #{self.arr_table[array_id][0]}, {temp})')
+            self.ss.append(temp)
+        
+        for param in self.func_table[self.current_func].params:
+            if param.name == id and param.is_array:
+                self.ss.append(param.address)
+                self.PB.append(f'(ADD, {index_temp}, #{self.param.address}, {temp})')
+                self.ss.append(temp)
+                break
+
+    
+    def save_index_value(self, token):
+        temp = self.gettemp()
+        index_addr = self.ss.pop()
+        self.PB.append(f'(ASSIGN, @{index_addr}, {temp}, )')
+        self.ss.append(temp)
+    
+    def save_id(self, token):
+        self.ss.append(token)
+
+    def push_id_value(self, token):
+        id = self.ss.pop()
+
+        if id in self.var_table:
+            var_addr = self.var_table[id]
+            self.ss.append(var_addr)
+
+        if id in self.arr_table:
+            arr_data = self.arr_table[id]
+            self.ss.append(arr_data[0])
+        
+        for param in self.func_table[self.current_func].params:
+            if param.name == id:
+                self.ss.append(param.address)
+                break
+
+    def start_call(self, token):
+        func_id = self.ss.pop()
+        self.calling_functions_stack.append(func_id)
+
+    def end_func_call(self, token):
+        calling_function_id = self.calling_functions_stack.pop()
+        func_params = self.func_table[calling_function_id].params
+        func_params = func_params.copy()
+        func_params.reverse()
+        for func_param in func_params:
+            self.PB.append(f'(ASSIGN, {var_addr}, {temp}, )')
 
 class function_data:
     def __init__(self, name, return_type, return_address, return_value_address, first_instruction_index):
