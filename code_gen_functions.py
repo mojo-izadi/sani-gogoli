@@ -2,7 +2,7 @@ class Code_gen:
 
     def __init__(self) -> None:
         self.ss = []
-        self.PB = []
+        self.PB = ['']
         self.last_free_temp_address = 500
         self.last_free_address = 100
         self.func_table = {}
@@ -128,7 +128,7 @@ class Code_gen:
         for param in self.func_table[self.current_func].params:
             if param.name == id and param.is_array:
                 self.ss.append(param.address)
-                self.PB.append(f'(ADD, {index_temp}, #{self.param.address}, {temp})')
+                self.PB.append(f'(ADD, {index_temp}, {self.param.address}, {temp})')
                 self.ss.append(temp)
                 break
 
@@ -164,11 +164,26 @@ class Code_gen:
 
     def end_func_call(self, token):
         calling_function_id = self.calling_functions_stack.pop()
-        func_params = self.func_table[calling_function_id].params
+        func_data = self.func_table[calling_function_id]
+        func_params = func_data.params
         func_params = func_params.copy()
         func_params.reverse()
         for func_param in func_params:
-            self.PB.append(f'(ASSIGN, {var_addr}, {temp}, )')
+            param_temp = self.ss.pop()
+            if func_param.is_array:
+                self.PB.append(f'(ASSIGN, #{param_temp}, {func_param.address}, )')
+            else:
+                self.PB.append(f'(ASSIGN, {param_temp}, {func_param.address}, )')
+        
+        self.PB.append(f'(ASSIGN, #{len(self.PB) + 2}, {func_data.return_address}, )')
+        self.PB.append(f'(JP, {func_data.first_instruction_index}, , )')
+
+        temp = self.gettemp()
+        self.PB.append(f'(ASSIGN, {func_data.return_value_address}, {temp}, )')
+        self.ss.append(temp)
+        
+        
+                
 
 class function_data:
     def __init__(self, name, return_type, return_address, return_value_address, first_instruction_index):
