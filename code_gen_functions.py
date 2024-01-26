@@ -8,6 +8,7 @@ class Code_gen:
         self.func_table = {}
         self.var_table = {}
         self.arr_table = {}
+        self.current_func = None
 
 
     def gettemp(self):
@@ -71,7 +72,8 @@ class Code_gen:
     def define_func(self, token):
         name = self.ss.pop()
         type = self.ss.pop()
-        self.ss.append(name)
+        # self.ss.append(name)
+        self.current_func = name
         first_instruction_index = len(self.PB)
         return_address = self.gettemp()
         return_value_address = self.gettemp()
@@ -81,20 +83,30 @@ class Code_gen:
         param_name = self.ss.pop()
         type = self.ss.pop()
         address = self.get_new_addr(1)
-        func_name = self.ss[-1]
+        func_name = self.current_func
         self.func_table[func_name].add_param(param_data(param_name, address, False))
     
     def define_param_arr(self, token):
         param_name = self.ss.pop()
         type = self.ss.pop()
         address = self.get_new_addr(1)
-        func_name = self.ss[-1]
+        func_name = self.current_func
         self.func_table[func_name].add_param(param_data(param_name, address, True))
     
     def end_func_body(self, token):
         self.var_table = {}
         self.arr_table = {}
-        func_name = self.ss.pop()
+        func_name = self.current_func
+        self.PB.append(f'(JP, @{self.func_table[func_name].return_address}, , )')
+        self.current_func = None
+    
+    def set_return_value(self, token):
+        return_value = self.ss.pop()
+        func_name = self.current_func
+        self.PB.append(f'(ASSIGN, {return_value}, {self.func_table[func_name].return_value}, )')
+    
+    def return_control(self, token):
+        func_name = self.current_func
         self.PB.append(f'(JP, @{self.func_table[func_name].return_address}, , )')
     
 
