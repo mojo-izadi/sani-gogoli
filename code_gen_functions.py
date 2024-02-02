@@ -20,6 +20,12 @@ class Code_gen:
         self.last_free_address += 4*size
         return self.last_free_address - 4*size
 
+    def save_num(self, token):
+        temp = self.gettemp()
+        self.PB.append(f'(ASSIGN, #{token}, {temp}, )')
+        self.ss.append(temp)
+
+        
     def add(self, token):
         op1 = self.ss.pop()
         op2 = self.ss.pop()
@@ -112,7 +118,7 @@ class Code_gen:
     def set_return_value(self, token):
         return_value = self.ss.pop()
         func_name = self.current_func
-        self.PB.append(f'(ASSIGN, {return_value}, {self.func_table[func_name].return_value}, )')
+        self.PB.append(f'(ASSIGN, {return_value}, {self.func_table[func_name].return_value_address}, )')
     
     def return_control(self, token):
         func_name = self.current_func

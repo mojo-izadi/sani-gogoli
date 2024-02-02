@@ -351,7 +351,89 @@ class Scanner:
 
 
 parse_table = {"Program": [-1, -1, -1, -1, -1, -1, -1, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1], "DeclarationList": [2, 2, -1, 2, -1, 2, -1, 1, 1, -1, 2, 2, 2, 2, -1, 2, 2, -1, -1, -1, 2, 2, -1, 2, -1], "Declaration": ["synch", "synch", -1, "synch", -1, "synch", -1, 3, 3, -1, "synch", "synch", "synch", "synch", -1, "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "DeclarationInitial": [-1, "synch", "synch", -1, -1, "synch", "synch", 4, 4, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "DeclarationPrime": ["synch", 6, 6, "synch", -1, 5, -1, "synch", "synch", -1, "synch", "synch", "synch", "synch", -1, "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "VarDeclarationPrime": ["synch", 7, 8, "synch", -1, "synch", -1, "synch", "synch", -1, "synch", "synch", "synch", "synch", -1, "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "FunDeclarationPrime": ["synch", "synch", -1, "synch", -1, 9, -1, "synch", "synch", -1, "synch", "synch", "synch", "synch", -1, "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "TypeSpecifier": ["synch", -1, -1, -1, -1, -1, -1, 10, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "Params": [-1, -1, -1, -1, -1, -1, "synch", 12, 13, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "ParamList": [-1, -1, -1, -1, -1, -1, 15, -1, -1, 14, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "Param": [-1, -1, -1, -1, -1, -1, "synch", 16, 16, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "ParamPrime": [-1, -1, 17, -1, -1, -1, 18, -1, -1, 18, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "CompoundStmt": ["synch", "synch", -1, "synch", -1, "synch", -1, "synch", "synch", -1, 19, "synch", "synch", "synch", "synch", "synch", "synch", -1, -1, -1, "synch", "synch", -1, "synch", -1], "StatementList": [20, 20, -1, 20, -1, 20, -1, -1, -1, -1, 20, 21, 20, 20, -1, 20, 20, -1, -1, -1, 20, 20, -1, -1, -1], "Statement": [22, 22, -1, 22, -1, 22, -1, -1, -1, -1, 23, "synch", 22, 24, "synch", 25, 26, -1, -1, -1, 22, 22, -1, -1, -1], "ExpressionStmt": [27, 29, -1, 27, -1, 27, -1, -1, -1, -1, "synch", "synch", 28, "synch", "synch", "synch", "synch", -1, -1, -1, 27, 27, -1, -1, -1], "SelectionStmt": ["synch", "synch", -1, "synch", -1, "synch", -1, -1, -1, -1, "synch", "synch", "synch", 30, "synch", "synch", "synch", -1, -1, -1, "synch", "synch", -1, -1, -1], "IterationStmt": ["synch", "synch", -1, "synch", -1, "synch", -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", 31, "synch", -1, -1, -1, "synch", "synch", -1, -1, -1], "ReturnStmt": ["synch", "synch", -1, "synch", -1, "synch", -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", "synch", 32, -1, -1, -1, "synch", "synch", -1, -1, -1], "ReturnStmtPrime": [34, 33, -1, 34, -1, 34, -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", "synch", "synch", -1, -1, -1, 34, 34, -1, -1, -1], "Expression": [36, "synch", -1, 35, "synch", 35, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 35, 35, -1, -1, -1], "B": [-1, 39, 38, -1, 39, 39, 39, -1, -1, 39, -1, -1, -1, -1, -1, -1, -1, 37, 39, 39, 39, 39, 39, -1, -1], "H": [-1, 41, -1, -1, 41, -1, 41, -1, -1, 41, -1, -1, -1, -1, -1, -1, -1, 40, 41, 41, 41, 41, 41, -1, -1], "SimpleExpressionZegond": [-1, "synch", -1, 42, "synch", 42, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 42, 42, -1, -1, -1], "SimpleExpressionPrime": [-1, 43, -1, -1, 43, 43, 43, -1, -1, 43, -1, -1, -1, -1, -1, -1, -1, -1, 43, 43, 43, 43, 43, -1, -1], "C": [-1, 45, -1, -1, 45, -1, 45, -1, -1, 45, -1, -1, -1, -1, -1, -1, -1, -1, 44, 44, -1, -1, -1, -1, -1], "Relop": ["synch", -1, -1, "synch", -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 46, 47, "synch", "synch", -1, -1, -1], "AdditiveExpression": [48, "synch", -1, 48, "synch", 48, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 48, 48, -1, -1, -1], "AdditiveExpressionPrime": [-1, 49, -1, -1, 49, 49, 49, -1, -1, 49, -1, -1, -1, -1, -1, -1, -1, -1, 49, 49, 49, 49, 49, -1, -1], "AdditiveExpressionZegond": [-1, "synch", -1, 50, "synch", 50, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 50, 50, -1, -1, -1], "D": [-1, 52, -1, -1, 52, -1, 52, -1, -1, 52, -1, -1, -1, -1, -1, -1, -1, -1, 52, 52, 51, 51, -1, -1, -1], "Addop": ["synch", -1, -1, "synch", -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 53, 54, -1, -1, -1], "Term": [55, "synch", -1, 55, "synch", 55, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 55, 55, -1, -1, -1], "TermPrime": [-1, 56, -1, -1, 56, 56, 56, -1, -1, 56, -1, -1, -1, -1, -1, -1, -1, -1, 56, 56, 56, 56, 56, -1, -1], "TermZegond": [-1, "synch", -1, 57, "synch", 57, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 57, 57, -1, -1, -1], "G": [-1, 59, -1, -1, 59, -1, 59, -1, -1, 59, -1, -1, -1, -1, -1, -1, -1, -1, 59, 59, 59, 59, 58, -1, -1], "SignedFactor": [62, "synch", -1, 62, "synch", 62, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 60, 61, "synch", -1, -1], "SignedFactorPrime": [-1, 63, -1, -1, 63, 63, 63, -1, -1, 63, -1, -1, -1, -1, -1, -1, -1, -1, 63, 63, 63, 63, 63, -1, -1], "SignedFactorZegond": [-1, "synch", -1, 66, "synch", 66, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", 64, 65, "synch", -1, -1], "Factor": [68, "synch", -1, 69, "synch", 67, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", -1, -1], "VarCallPrime": [-1, 71, 71, -1, 71, 70, 71, -1, -1, 71, -1, -1, -1, -1, -1, -1, -1, -1, 71, 71, 71, 71, 71, -1, -1], "VarPrime": [-1, 73, 72, -1, 73, -1, 73, -1, -1, 73, -1, -1, -1, -1, -1, -1, -1, -1, 73, 73, 73, 73, 73, -1, -1], "FactorPrime": [-1, 75, -1, -1, 75, 74, 75, -1, -1, 75, -1, -1, -1, -1, -1, -1, -1, -1, 75, 75, 75, 75, 75, -1, -1], "FactorZegond": [-1, "synch", -1, 77, "synch", 76, "synch", -1, -1, "synch", -1, -1, -1, -1, -1, -1, -1, -1, "synch", "synch", "synch", "synch", "synch", -1, -1], "Args": [78, -1, -1, 78, -1, 78, 79, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 78, 78, -1, -1, -1], "ArgList": [80, -1, -1, 80, -1, 80, "synch", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 80, 80, -1, -1, -1], "ArgListPrime": [-1, -1, -1, -1, -1, -1, 82, -1, -1, 81, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]}
-instruction_rights = ["DeclarationList", "Declaration DeclarationList", "", "DeclarationInitial DeclarationPrime", "TypeSpecifier ID", "FunDeclarationPrime", "VarDeclarationPrime", ";", "[ NUM ] ;", "( Params ) CompoundStmt", "int", "void", "int ID ParamPrime ParamList", "void", ", Param ParamList", "", "DeclarationInitial ParamPrime", "[ ]", "", "{ DeclarationList StatementList }", "Statement StatementList", "", "ExpressionStmt", "CompoundStmt", "SelectionStmt", "IterationStmt", "ReturnStmt", "Expression ;", "break ;", ";", "if ( Expression ) Statement else Statement", "while ( Expression ) Statement", "return ReturnStmtPrime", ";", "Expression ;", "SimpleExpressionZegond", "ID B", "= Expression", "[ Expression ] H", "SimpleExpressionPrime", "= Expression", "G D C", "AdditiveExpressionZegond C", "AdditiveExpressionPrime C", "Relop AdditiveExpression", "", "<", "==", "Term D", "TermPrime D", "TermZegond D", "Addop Term D", "", "+", "-", "SignedFactor G", "SignedFactorPrime G", "SignedFactorZegond G", "* SignedFactor G", "", "+ Factor", "- Factor", "Factor", "FactorPrime", "+ Factor", "- Factor", "FactorZegond", "( Expression )", "ID VarCallPrime", "NUM", "( Args )", "VarPrime", "[ Expression ]", "", "( Args )", "", "( Expression )", "NUM", "ArgList", "", "Expression ArgListPrime", ", Expression ArgListPrime", ""]
+instruction_rights = ["DeclarationList",
+"Declaration DeclarationList",
+"",
+"DeclarationInitial DeclarationPrime",
+"TypeSpecifier #save_type ID #save_id", 
+"FunDeclarationPrime",
+"VarDeclarationPrime",
+"; #define_var",
+"[ NUM #save_num #define_arr ] ;",
+"( #define_func Params ) CompoundStmt #end_func_body",
+"int",
+"void",
+"int #save_type ID #save_id ParamPrime ParamList",
+"void",
+", Param ParamList",
+"",
+"DeclarationInitial ParamPrime",
+"[ #define_param_arr]",
+"#define_param_var",
+"{ DeclarationList StatementList }",
+"Statement StatementList",
+"",
+"ExpressionStmt",
+"CompoundStmt",
+"SelectionStmt",
+"IterationStmt",
+"ReturnStmt",
+"Expression ;",
+"break ;",
+";",
+"if ( Expression ) Statement else Statement",
+"while ( Expression ) Statement",
+"return ReturnStmtPrime #return_control",
+";",
+"Expression #set_return_value ;",
+"SimpleExpressionZegond",
+"ID #save_id B",
+"= Expression #assign",
+"[ Expression ] #save_index_address H",
+"SimpleExpressionPrime",
+"= Expression #assign_arr",
+"#save_index_value G D C",
+"AdditiveExpressionZegond C",
+"AdditiveExpressionPrime C",
+"Relop AdditiveExpression",
+"",
+"<",
+"==",
+"Term D",
+"TermPrime D",
+"TermZegond D",
+"Addop #save_addop Term #add_sub D",
+"",
+"+",
+"-",
+"SignedFactor G",
+"SignedFactorPrime G",
+"SignedFactorZegond G",
+"* SignedFactor #mult G",
+"",
+"+ Factor",
+"- Factor",
+"Factor",
+"FactorPrime",
+"+ Factor",
+"- Factor",
+"FactorZegond",
+"( Expression )",
+"ID #save_id VarCallPrime",
+"NUM #save_num",
+"( #start_call Args ) #end_func_call",
+"VarPrime",
+"[ Expression ] #save_index_address #save_index_value",
+"#push_id_value",
+"( #start_call Args ) #end_func_call",
+"#push_id_value",
+"( Expression )",
+"NUM #save_num",
+"ArgList",
+"",
+"Expression ArgListPrime",
+", Expression ArgListPrime",
+""]
 headers = ['ID', ';', '[', 'NUM', ']', '(', ')', 'int', 'void', ',', '{', '}', 'break', 'if', 'else', 'while', 'return', '=', '<', '==', '+', '-', '*', '┤', '/']
 headers = {headers[i]: i for i in range(0, len(headers))}
 
@@ -369,7 +451,7 @@ def get_next_token():
 
 token = get_next_token()
 token_type = token[1]
-token_value = token[2]
+token_value = [0 ,token[2]]
 
 line_number = 1
 syntax_errors = []
@@ -383,23 +465,24 @@ while True:
         break
     if popped.name.startswith('#'):
         function_to_run = popped.name[1:]
+        print(code_gen.ss, function_to_run)
         func = getattr(code_gen, function_to_run)
-        func(token_value)
+        func(token_value[0])
     elif headers.__contains__(popped.name):
-        if popped.name != token_value and popped.name != 'ID' and popped.name != 'NUM':
+        if popped.name != token_value[1] and popped.name != 'ID' and popped.name != 'NUM':
             syntax_errors.append((popped.name ,"missing" ,line_number))
             popped.parent = None
         else:
-            popped.name = f'({token_type}, {token_value})'
+            popped.name = f'({token_type}, {token_value[1]})'
             token = get_next_token()
             token_type = token[1]
-            token_value = token[2]
+            token_value = (token_value + [token[2], ])[1:]
             line_number = token[3]
     elif popped.name == 'epsilon':
         pass
     else:
-        temp_token_value = token_value
-        if (not headers.__contains__(token_value)):
+        temp_token_value = token_value[1]
+        if (not headers.__contains__(token_value[1])):
             temp_token_value = 'ID'
             if token_type == 'NUM':
                 temp_token_value = token_type
@@ -460,6 +543,6 @@ else:
 f.close()
 
 f = open("code.txt", "w", encoding="utf-8")
-f.writelines([f"{i}.{code_gen.PB[i]}\n" for i in len(code_gen.PB)])
+f.writelines([f"{i}.{code_gen.PB[i]}\n" for i in range(len(code_gen.PB))])
 
 f.close()
