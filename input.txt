@@ -1,5 +1,0 @@
-/*===== Sample 1 =====*/
-void main(int a){
-	int i;
-	i = 3 + 5;
-}

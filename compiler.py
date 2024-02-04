@@ -359,7 +359,7 @@ instruction_rights = ["DeclarationList",
 "FunDeclarationPrime",
 "VarDeclarationPrime",
 "; #define_var",
-"[ NUM #save_num #define_arr ] ;",
+"[ NUM #define_arr ] ;",
 "( #define_func Params ) CompoundStmt #end_func_body",
 "int",
 "void",
@@ -368,7 +368,7 @@ instruction_rights = ["DeclarationList",
 ", Param ParamList",
 "",
 "DeclarationInitial ParamPrime",
-"[ #define_param_arr]",
+"[ #define_param_arr ]",
 "#define_param_var",
 "{ DeclarationList StatementList }",
 "Statement StatementList",
@@ -378,11 +378,11 @@ instruction_rights = ["DeclarationList",
 "SelectionStmt",
 "IterationStmt",
 "ReturnStmt",
-"Expression ;",
-"break ;",
+"Expression #remove_assigned ;",
+"break #break_action ;",
 ";",
-"if ( Expression ) Statement else Statement",
-"while ( Expression ) Statement",
+"if ( Expression #save_if ) Statement else #jpf_save Statement #jp",
+"while #label ( Expression ) #save Statement #end_while",
 "return ReturnStmtPrime #return_control",
 ";",
 "Expression #set_return_value ;",
@@ -395,7 +395,7 @@ instruction_rights = ["DeclarationList",
 "#save_index_value G D C",
 "AdditiveExpressionZegond C",
 "AdditiveExpressionPrime C",
-"Relop AdditiveExpression",
+"Relop #save_addop AdditiveExpression #relop",
 "",
 "<",
 "==",
@@ -455,6 +455,7 @@ token_value = [0 ,token[2]]
 
 line_number = 1
 syntax_errors = []
+semantic_errors = []
 skip_token = False
 invalid_end = False
 while True:
@@ -467,7 +468,9 @@ while True:
         function_to_run = popped.name[1:]
         print(code_gen.ss, function_to_run)
         func = getattr(code_gen, function_to_run)
-        func(token_value[0])
+        err = func(token_value[0])
+        if err:
+            semantic_errors.append((err.message, line_number))
     elif headers.__contains__(popped.name):
         if popped.name != token_value[1] and popped.name != 'ID' and popped.name != 'NUM':
             syntax_errors.append((popped.name ,"missing" ,line_number))
@@ -542,7 +545,18 @@ else:
 
 f.close()
 
-f = open("code.txt", "w", encoding="utf-8")
-f.writelines([f"{i}.{code_gen.PB[i]}\n" for i in range(len(code_gen.PB))])
+f = open("output.txt", "w", encoding="utf-8")
+if semantic_errors:
+    f.write("The code has not been generated.\n")
+else:
+    f.writelines([f"{i}\t{code_gen.PB[i]}\n" for i in range(len(code_gen.PB[:-1]))])
+
+f.close()
+
+f = open("semantic_errors.txt", "w", encoding="utf-8")
+if not semantic_errors:
+    f.write("The input program is semantically correct.\n")
+else:
+    f.writelines([f"#{error[1]} : Semantic Error! {error[0]}.\n" for error in semantic_errors])
 
 f.close()

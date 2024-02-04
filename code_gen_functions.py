@@ -8,8 +8,11 @@ class Code_gen:
         self.func_table = {}
         self.var_table = {}
         self.arr_table = {}
+        self.global_var_table = {}
+        self.global_arr_table = {}
         self.current_func = None
         self.calling_functions_stack = []
+        self.while_depth = 0
 
 
     def gettemp(self):
@@ -42,7 +45,16 @@ class Code_gen:
         opt = 'ADD' if opt == '+' else 'SUB'
         op2 = self.ss.pop()
         temp = self.gettemp()
-        self.PB.append(f'({opt}, {op1}, {op2}, {temp})')
+        self.PB.append(f'({opt}, {op2}, {op1}, {temp})')
+        self.ss.append(temp)
+
+    def relop(self, token):
+        op1 = self.ss.pop()
+        opt = self.ss.pop()
+        opt = 'EQ' if opt == '==' else 'LT'
+        op2 = self.ss.pop()
+        temp = self.gettemp()
+        self.PB.append(f'({opt}, {op2}, {op1}, {temp})')
         self.ss.append(temp)
     
     def mult(self, token):
@@ -54,7 +66,14 @@ class Code_gen:
     
     def assign(self, token):
         tempValue = self.ss.pop()
-        assignee = self.ss.pop()
+        name = self.ss.pop()
+        if name in self.var_table:
+            assignee = self.var_table[name]
+        elif name in self.global_var_table:
+            assignee = self.global_var_table[name]
+        else:
+            self.ss.append(tempValue)
+            return Error(f'\'{name}\' is not defined')
         self.PB.append(f'(ASSIGN, {tempValue}, {assignee}, )')
         self.ss.append(tempValue)
     
@@ -74,13 +93,25 @@ class Code_gen:
         name = self.ss.pop()
         type = self.ss.pop()
         address = self.get_new_addr(1)
-        self.var_table[name] = address
+        if type == 'void':
+            self.var_table[name] = address
+            return Error(f'Illegal type of void for \'{name}\'')
+        if self.current_func:
+            self.var_table[name] = address
+        else:
+            self.global_var_table[name] = address
     
     def define_arr(self, token):
         name = self.ss.pop()
         type = self.ss.pop()
-        address = self.get_new_addr(token)
-        self.arr_table[name] = (address, token)
+        address = self.get_new_addr(int(token))
+        if type == 'void':
+            self.arr_table[name] = (address, token)
+            return Error(f'Illegal type of void for \'{name}\'')
+        if self.current_func:
+            self.arr_table[name] = (address, token)
+        else:
+            self.global_arr_table[name] = (address, token)
     
     def define_func(self, token):
         name = self.ss.pop()
@@ -90,6 +121,7 @@ class Code_gen:
         first_instruction_index = len(self.PB)
         return_address = self.gettemp()
         return_value_address = self.gettemp()
+        self.PB.append(f'(ASSIGN, #0, {return_value_address}, )')
         self.func_table[name] = function_data(name, type, return_address, return_value_address, first_instruction_index)
         if name == 'main':
             self.PB[0] = f'(JP, {first_instruction_index}, , )'
@@ -128,17 +160,29 @@ class Code_gen:
         index_temp = self.ss.pop()
         array_id = self.ss.pop()
         temp = self.gettemp()
+        initial_len = len(self.PB)
 
         if array_id in self.arr_table:
             self.PB.append(f'(ADD, {index_temp}, #{self.arr_table[array_id][0]}, {temp})')
             self.ss.append(temp)
+            return
         
         for param in self.func_table[self.current_func].params:
-            if param.name == id and param.is_array:
-                self.ss.append(param.address)
-                self.PB.append(f'(ADD, {index_temp}, {self.param.address}, {temp})')
+            if param.name == array_id and param.is_array:
+                # self.ss.append(param.address)
+                self.PB.append(f'(ADD, {index_temp}, {param.address}, {temp})')
                 self.ss.append(temp)
-                break
+                return
+        
+        if array_id in self.global_arr_table:
+            self.PB.append(f'(ADD, {index_temp}, #{self.global_arr_table[array_id][0]}, {temp})')
+            self.ss.append(temp)
+            return
+        
+        if initial_len == len(self.PB):
+            self.ss.append(1)
+            self.ss.append(1)
+            return Error(f'\'{array_id}\' is not defined')
 
     
     def save_index_value(self, token):
@@ -165,30 +209,121 @@ class Code_gen:
             if param.name == id:
                 self.ss.append(param.address)
                 break
+        
+        if id in self.global_var_table:
+            var_addr = self.global_var_table[id]
+            self.ss.append(var_addr)
+        
+        if id in self.global_arr_table:
+            arr_data = self.global_arr_table[id]
+            self.ss.append(arr_data[0])
+
 
     def start_call(self, token):
         func_id = self.ss.pop()
         self.calling_functions_stack.append(func_id)
+        if func_id == self.current_func:
+            exit(1)
+        self.ss.append('1c')
 
     def end_func_call(self, token):
         calling_function_id = self.calling_functions_stack.pop()
+        if calling_function_id == 'output':
+            if self.ss[-2] != '1c':
+                return Error(f'Mismatch in numbers of arguments of \'output\'')
+            self.PB.append(f'(PRINT, {self.ss.pop()}, , )')
+            self.ss.pop()
+            self.ss.append('dummy')
+            return
+        if calling_function_id not in self.func_table:
+            return Error(f'\'{calling_function_id}\' is not defined')
         func_data = self.func_table[calling_function_id]
         func_params = func_data.params
         func_params = func_params.copy()
         func_params.reverse()
         for func_param in func_params:
             param_temp = self.ss.pop()
+            if param_temp == '1c':
+                return Error(f'Mismatch in numbers of arguments of \'{calling_function_id}\'')
             if func_param.is_array:
                 self.PB.append(f'(ASSIGN, #{param_temp}, {func_param.address}, )')
             else:
                 self.PB.append(f'(ASSIGN, {param_temp}, {func_param.address}, )')
         
+        top = self.ss.pop()
+        if top != '1c':
+            self.ss.append('dummy')
+            return Error(f'Mismatch in numbers of arguments of \'{calling_function_id}\'')
         self.PB.append(f'(ASSIGN, #{len(self.PB) + 2}, {func_data.return_address}, )')
         self.PB.append(f'(JP, {func_data.first_instruction_index}, , )')
 
         temp = self.gettemp()
         self.PB.append(f'(ASSIGN, {func_data.return_value_address}, {temp}, )')
         self.ss.append(temp)
+        
+        
+    
+    def label(self, token):
+        temp = self.gettemp()
+        self.PB.append('')
+        self.ss.append(temp)
+        self.ss.append(len(self.PB))
+        self.while_depth += 1
+    
+    def save(self, token):
+        self.ss.append(len(self.PB))
+        self.PB.append('')
+    
+    def save_if(self, token):
+        self.ss.append(len(self.PB))
+        self.ss.append('1i')
+        self.PB.append('')
+    
+    def end_while(self, token):
+        condition_end_addr = self.ss.pop()
+        condition_value = self.ss.pop()
+        while_start_addr = self.ss.pop()
+        condition_end_line_addr = self.ss.pop()
+        self.PB.append(f'(JP, {while_start_addr}, , )')
+        self.PB[while_start_addr - 1] = f'(ASSIGN, #{len(self.PB)}, {condition_end_line_addr}, )'
+        self.PB[condition_end_addr] = f'(JPF, {condition_value}, {len(self.PB)}, )'
+        self.while_depth -= 1
+    
+    def break_action(self, token):
+        if self.while_depth == 0:
+            return Error("No 'while' found for 'break'")
+        ss_top = -1
+        break_addr = -4
+        while True:
+            if self.ss[ss_top] == '1e':
+                break_addr -= 2
+                ss_top -= 2
+            elif self.ss[ss_top] == '1i':
+                break_addr -= 3
+                ss_top -= 3
+            else:
+                break
+
+        self.PB.append(f'(JP, @{self.ss[break_addr]}, , )')
+
+        
+    def remove_assigned(self, token):
+        self.ss.pop()
+
+
+    def jpf_save(self, token):
+        self.ss.pop() #pop 1i
+        if_start = self.ss.pop()
+        condition_value = self.ss.pop()
+        self.ss.append(len(self.PB))
+        self.ss.append('1e')
+        self.PB.append('')
+        self.PB[if_start] = f'(JPF, {condition_value}, {len(self.PB)}, )'
+    
+    def jp(self, token):
+        self.ss.pop() # 1e
+        condition_addr = self.ss.pop()
+        self.PB[condition_addr] = f'(JP, {len(self.PB)}, , )'
         
         
                 
@@ -210,3 +345,7 @@ class param_data:
         self.name = name
         self.address = address
         self.is_array = is_array
+
+class Error:
+    def __init__(self, message) -> None:
+        self.message = message
