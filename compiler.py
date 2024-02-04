@@ -271,7 +271,7 @@ class Scanner:
 
     def __init__(self):
         self.data = Data()
-        file_code = open("input.txt", "r")
+        file_code = open("P3 tests\O2-SEMANTIC\input.txt", "r")
         self.code = file_code.read()
         file_code.close()
         

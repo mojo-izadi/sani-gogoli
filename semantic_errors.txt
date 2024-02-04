@@ -1,1 +1,2 @@
-The input program is semantically correct.
+#8 : Semantic Error! Illegal type of void for 'e'.
+#11 : Semantic Error! 'f' is not defined.
