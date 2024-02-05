@@ -3,8 +3,8 @@ class Code_gen:
     def __init__(self) -> None:
         self.ss = []
         self.ts = []
-        self.PB = ['']
-        self.last_free_temp_address = 500
+        self.PB = ['(ASSIGN, #1004, 1000, )', '', '']
+        # self.last_free_temp_address = 500
         self.last_free_address = 100
         self.func_table = {}
         self.var_table = {}
@@ -14,11 +14,11 @@ class Code_gen:
         self.current_func = None
         self.calling_functions_stack = []
         self.while_depth = 0
+        self.SM = StackManager(self.PB)
 
 
     def gettemp(self):
-        self.last_free_temp_address += 4
-        return self.last_free_temp_address - 4
+        return self.get_new_addr(1)
 
     def get_new_addr(self, size):
         self.last_free_address += 4*size
@@ -153,7 +153,7 @@ class Code_gen:
         self.PB.append(f'(ASSIGN, #0, {return_value_address}, )')
         self.func_table[name] = function_data(name, type, return_address, return_value_address, first_instruction_index)
         if name == 'main':
-            self.PB[0] = f'(JP, {first_instruction_index}, , )'
+            self.PB[2] = f'(JP, {first_instruction_index}, , )'
       
     def define_param_var(self, token):
         param_name = self.ss.pop()
@@ -178,6 +178,14 @@ class Code_gen:
         self.arr_table = {}
         func_name = self.current_func
         self.PB.append(f'(JP, @{self.func_table[func_name].return_address}, , )')
+        if self.current_func == 'main':
+            end_line = len(self.PB)
+            # self.PB.append('')
+            self.PB[1] = f'(JP, {len(self.PB)}, , )'
+            self.PB += [f'(ASSIGN, #0, {i}, )' for i in range(100, self.last_free_address, 4)]
+            self.PB += ['(JP, 2, , )', '(ADD, 100, 100, 100)']
+            self.PB[end_line - 1] = f'(JP, {len(self.PB) - 1}, , )'
+            
         self.current_func = None
     
     def set_return_value(self, token):
@@ -282,11 +290,13 @@ class Code_gen:
 
 
     def start_call(self, token):
+        if self.current_func != 'main':
+            self.SM.bulk_push(self.func_table[self.current_func].return_address, self.last_free_address)
         func_id = self.ss.pop()
         self.ts.pop()
         self.calling_functions_stack.append(func_id)
-        if func_id == self.current_func:
-            exit(1)
+        # if func_id == self.current_func:
+        #     exit(1)
         self.ss.append('1c')
         self.ts.append('')
 
@@ -302,6 +312,8 @@ class Code_gen:
             self.ts.pop()
             self.ss.append('dummy')
             self.ts.append('')
+            if self.current_func != 'main':
+                self.SM.bulk_pop()
             return
         if calling_function_id not in self.func_table:
             return Error(f'\'{calling_function_id}\' is not defined')
@@ -345,6 +357,8 @@ class Code_gen:
         self.ts.append('int')
         if error:
             return error
+        if self.current_func != 'main':
+            self.SM.bulk_pop()
         
         
     
@@ -451,3 +465,23 @@ class param_data:
 class Error:
     def __init__(self, message) -> None:
         self.message = message
+
+class StackManager():
+    def __init__(self, PB):
+        self.PB = PB
+        self.sp = 1000
+        self.vals = []
+
+    def bulk_push(self, start, stop):
+        self.vals.append((start, stop))
+        for addr in range(start, stop, 4):
+            self.PB.append(f'(ASSIGN, {addr}, @{self.sp}, )')
+            self.PB.append(f'(ADD, {self.sp}, #4, {self.sp})')
+
+    def bulk_pop(self):
+        start, stop = self.vals.pop()
+        addrs = list(range(start, stop, 4))
+        addrs.reverse()
+        for addr in addrs:
+            self.PB.append(f'(SUB, {self.sp}, #4, {self.sp})')
+            self.PB.append(f'(ASSIGN, @{self.sp}, {addr}, )')

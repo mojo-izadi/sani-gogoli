@@ -1,3 +1,1 @@
-#7 : Semantic Error! Illegal type of void for 'e'.
-#11 : Semantic Error! 'f' is not defined.
-#12 : Semantic Error! Type mismatch in operands, Got int instead of array.
+The input program is semantically correct.

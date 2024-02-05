@@ -271,7 +271,7 @@ class Scanner:
 
     def __init__(self):
         self.data = Data()
-        file_code = open("input.txt", "r")
+        file_code = open("P3 tests\O3-RECURSIVE\input.txt", "r")
         self.code = file_code.read()
         file_code.close()
         
@@ -533,7 +533,7 @@ f = open("output.txt", "w", encoding="utf-8")
 if semantic_errors:
     f.write("The code has not been generated.\n")
 else:
-    f.writelines([f"{i}\t{code_gen.PB[i]}\n" for i in range(len(code_gen.PB[:-1]))])
+    f.writelines([f"{i}\t{code_gen.PB[i]}\n" for i in range(len(code_gen.PB))])
 
 f.close()
 
