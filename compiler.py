@@ -271,7 +271,7 @@ class Scanner:
 
     def __init__(self):
         self.data = Data()
-        file_code = open("P3 tests\O2-SEMANTIC\input.txt", "r")
+        file_code = open("input.txt", "r")
         self.code = file_code.read()
         file_code.close()
         
@@ -453,7 +453,7 @@ token = get_next_token()
 token_type = token[1]
 token_value = [0 ,token[2]]
 
-line_number = 1
+line_number = [1, 1]
 syntax_errors = []
 semantic_errors = []
 skip_token = False
@@ -470,17 +470,17 @@ while True:
         func = getattr(code_gen, function_to_run)
         err = func(token_value[0])
         if err:
-            semantic_errors.append((err.message, line_number))
+            semantic_errors.append((err.message, line_number[0]))
     elif headers.__contains__(popped.name):
         if popped.name != token_value[1] and popped.name != 'ID' and popped.name != 'NUM':
-            syntax_errors.append((popped.name ,"missing" ,line_number))
+            syntax_errors.append((popped.name ,"missing" ,line_number[0]))
             popped.parent = None
         else:
             popped.name = f'({token_type}, {token_value[1]})'
             token = get_next_token()
             token_type = token[1]
             token_value = (token_value + [token[2], ])[1:]
-            line_number = token[3]
+            line_number = (line_number + [token[3], ])[1:]
     elif popped.name == 'epsilon':
         pass
     else:
@@ -492,23 +492,7 @@ while True:
 
         instruction_to_use = parse_table[popped.name][headers[temp_token_value]]
         
-        # if(instruction_to_use == -1):
-        #     if token_value == '┤':
-        #         syntax_errors.append(("EOF" ,"Unexpected" ,line_number))
-        #         invalid_end = True
-        #         popped.parent = None
-        #         break
-        #     syntax_errors.append( (temp_token_value, "illegal", line_number) )
-        #     token = get_next_token()
-        #     token_type = token[1]
-        #     token_value = token[2]
-        #     line_number = token[3]
-        #     skip_token = True
-        #     continue
-        # if(instruction_to_use == "synch"):
-        #     syntax_errors.append( (popped.name, "missing", line_number) )
-        #     popped.parent = None
-        #     continue
+        
         states = instruction_rights[instruction_to_use].split(' ')
         newStack = []
         for state in states:
